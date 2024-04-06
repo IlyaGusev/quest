@@ -1,0 +1,9 @@
+{
+    "do_sample": true,
+    "repetition_penalty": 1.05,
+    "max_new_tokens": 2048,
+    "temperature": 0.8,
+    "top_k": null,
+    "top_p": null,
+    "min_p": 0.05
+}
