@@ -1,3 +1,4 @@
+import json
 from typing import List
 from pathlib import Path
 
@@ -43,11 +44,12 @@ def generate(
 
 def infer(
     input_path: str,
+    output_path: str,
     model_name: str,
     generation_config_path: str,
-    load_in_8bit: bool = True,
+    load_in_8bit: bool = False,
     load_in_4bit: bool = False,
-    batch_size: int = 1,
+    batch_size: int = 4,
     seed: int = 42
 ):
     set_random_seed(seed)
@@ -73,23 +75,29 @@ def infer(
     generation_config.bos_token_id = orig_generation_config.bos_token_id
 
     records = list(read_jsonl(input_path))
-    for batch in gen_batch(records, batch_size):
-        prompts = [r["prompt"] for r in batch]
-        outputs = generate(
-            model=model,
-            tokenizer=tokenizer,
-            prompts=prompts,
-            generation_config=generation_config
-        )
-        for prompt, output in zip(prompts, outputs):
-            print()
-            print("=========")
-            print(prompt)
-            print()
-            print("OUTPUT:")
-            print(output)
-            print("=========")
-            print()
+    with open(output_path, "w") as w:
+        for batch in gen_batch(records, batch_size):
+            prompts = [r["prompt"] for r in batch]
+            outputs = generate(
+                model=model,
+                tokenizer=tokenizer,
+                prompts=prompts,
+                generation_config=generation_config
+            )
+            for prompt, output in zip(prompts, outputs):
+                print()
+                print("=========")
+                print(prompt)
+                print()
+                print("OUTPUT:")
+                print(output)
+                print("=========")
+                print()
+            for record, output in zip(batch, outputs):
+                record["output"] = output
+                record["model_name"] = model_name
+                record["config_name"] = generation_config_path.name
+                w.write(json.dumps(record, ensure_ascii=False) + "\n")
 
 
 if __name__ == "__main__":
