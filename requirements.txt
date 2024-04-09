@@ -1,7 +1,7 @@
 torch==2.2.2
 flash-attn==2.5.6
 fire==0.6.0
-transfomers==4.39.3
+transformers==4.39.3
 accelerate==0.29.1
 bitsandbytes==0.43.0
 sentencepiece==0.2.0
