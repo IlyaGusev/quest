@@ -1,3 +1,4 @@
+import os
 import json
 from typing import List
 from pathlib import Path
@@ -23,23 +24,45 @@ def generate(
         add_generation_prompt=True,
         tokenize=False
     ) for prompt in prompts]
+    if tokenizer.pad_token_id is None and generation_config.pad_token_id is not None:
+        tokenizer.pad_token_id = generation_config.pad_token_id
     data = tokenizer(
         formatted_prompts,
         return_tensors="pt",
         padding=True
     )
     data = {k: v.to(model.device) for k, v in data.items()}
-    output_ids = model.generate(
+    results = model.generate(
         **data,
         generation_config=generation_config,
-        pad_token_id=generation_config.eos_token_id
+        return_dict_in_generate=True,
+        output_scores=True,
+        output_logits=True
     )
+    output_ids = results.sequences
+    logits = torch.stack(results.logits)
+    scores = torch.stack(results.scores)
+
     outputs = []
-    for sample_output_ids, sample_input_ids in zip(output_ids, data["input_ids"]):
+    metas = []
+    for i, (sample_output_ids, sample_input_ids) in enumerate(zip(output_ids, data["input_ids"])):
         sample_output_ids = sample_output_ids[len(sample_input_ids):]
         sample_output = tokenizer.decode(sample_output_ids, skip_special_tokens=True)
         outputs.append(sample_output)
-    return outputs
+        sample_logits = logits[:, i, :]
+        sample_logits_top_values, sample_logits_top_indices = torch.topk(sample_logits, k=30, dim=-1)
+        sample_scores = scores[:, i, :]
+        sample_scores_top_values, sample_scores_top_indices = torch.topk(sample_scores, k=30, dim=-1)
+        metas.append({
+            "logits_values": sample_logits_top_values,
+            "logits_indices": sample_logits_top_indices,
+            "scores_values": sample_scores_top_values,
+            "scores_indices": sample_scores_top_indices,
+            "output_ids": sample_output_ids
+        })
+        print(sample_logits_top_values.size(), sample_scores_top_values.size())
+
+    return outputs, metas
 
 
 def infer(
@@ -49,7 +72,7 @@ def infer(
     generation_config_path: str,
     load_in_8bit: bool = False,
     load_in_4bit: bool = False,
-    batch_size: int = 4,
+    batch_size: int = 3,
     seed: int = 42
 ):
     set_random_seed(seed)
@@ -71,14 +94,19 @@ def infer(
         generation_config_path.parent,
         generation_config_path.name
     )
+    generation_config.pad_token_id = orig_generation_config.pad_token_id
     generation_config.eos_token_id = orig_generation_config.eos_token_id
     generation_config.bos_token_id = orig_generation_config.bos_token_id
+    print("Full generation config:", generation_config)
 
     records = list(read_jsonl(input_path))
+    meta_dir = ".".join(output_path.split(".")[:-1])
+    Path(meta_dir).mkdir(parents=True, exist_ok=True)
     with open(output_path, "w") as w:
+        num = 0
         for batch in gen_batch(records, batch_size):
             prompts = [r["prompt"] for r in batch]
-            outputs = generate(
+            outputs, metas = generate(
                 model=model,
                 tokenizer=tokenizer,
                 prompts=prompts,
@@ -93,11 +121,13 @@ def infer(
                 print(output)
                 print("=========")
                 print()
-            for record, output in zip(batch, outputs):
+            for record, output, meta in zip(batch, outputs, metas):
                 record["output"] = output
                 record["model_name"] = model_name
                 record["config_name"] = generation_config_path.name
                 w.write(json.dumps(record, ensure_ascii=False) + "\n")
+                torch.save(meta, os.path.join(meta_dir, f"{num}.pt"))
+                num += 1
 
 
 if __name__ == "__main__":

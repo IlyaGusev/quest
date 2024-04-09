@@ -38,7 +38,8 @@ def process_pippa(
     output_path: str,
     dataset_name: str = "PygmalionAI/PIPPA",
     min_messages: int = 4,
-    sample_rate: float = 0.01,
+    sample_rate: float = 0.1,
+    nrows: int = 200,
     min_last_message_length: int = 150,
 ):
     records = []
@@ -63,7 +64,7 @@ def process_pippa(
         prompt = prompt.strip()
 
         found = False
-        full_prompt = f"{char_name}'s Persona: {context}\n####\n{prompt}\n<START>\n"
+        full_prompt = f"### {char_name}'s Persona: {context}\n\n### Example dialogue:\n{prompt}\n\n### Conversation:\n\n"
         for i, message in enumerate(messages):
             role = "User" if message["is_human"] else char_name
             content = message["message"].strip()
@@ -71,13 +72,15 @@ def process_pippa(
                 content = content[len(char_name) + 1:].strip()
             if role == char_name and i <= 7 and i >= 3 and len(content) > min_last_message_length:
                 if random.random() < sample_rate:
-                    full_prompt += f"{role}:"
+                    full_prompt += f"### Continue the conversation as {role}"
                     found = True
                     break
             full_prompt += f"{role}: {content}\n\n"
         if found:
             records.append({"prompt": full_prompt, "source": "pippa"})
 
+    random.shuffle(records)
+    records = records[:nrows]
     with open(output_path, "w") as w:
         for record in records:
             w.write(json.dumps(record, ensure_ascii=False) + "\n")

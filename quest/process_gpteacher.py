@@ -8,7 +8,7 @@ def process_gpteacher(
     input_path: str,
     output_path: str,
     nrows: int = 200,
-    min_output_length: int = 200,
+    min_output_length: int = 300,
 ):
     with open(input_path) as r:
         records = json.load(r)

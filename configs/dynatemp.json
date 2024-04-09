@@ -1,0 +1,10 @@
+{
+    "do_sample": true,
+    "temperature": 1.0,
+    "dynamic_temperature": true,
+    "dynatemp_low": 0.5,
+    "dynatemp_high": 1.5,
+    "dynatemp_exponent": 2.0,
+    "repetition_penalty": 1.05,
+    "max_new_tokens": 3072
+}
