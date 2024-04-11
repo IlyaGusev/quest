@@ -35,7 +35,7 @@ def to_alpaca_eval(
         json.dump([{
             "instruction": r["prompt"],
             "output": r["output"],
-            "generator": r["config_name"],
+            "generator": r["config_name"].replace(".json", ""),
         } for r in records], w, indent=4)
 
 

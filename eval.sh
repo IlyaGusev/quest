@@ -1,1 +1,1 @@
-alpaca_eval --model_outputs ../7b_min_p_05.json --reference_outputs ../default.json --annotators_config 'alpaca_eval_cot_gpt4_turbo_fn' --output-path results
+alpaca_eval make_leaderboard  --all_model_outputs data/outputs/aeval_all.json --reference_outputs  data/outputs/aeval_7b_temp100.json --annotators_config 'alpaca_eval_cot_gpt4_turbo_fn' --leaderboard-path leaderboard.csv

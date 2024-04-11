@@ -60,7 +60,6 @@ def generate(
             "scores_indices": sample_scores_top_indices,
             "output_ids": sample_output_ids
         })
-        print(sample_logits_top_values.size(), sample_scores_top_values.size())
 
     return outputs, metas
 
