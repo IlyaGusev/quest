@@ -1,0 +1,9 @@
+{
+    "do_sample": true,
+    "repetition_penalty": 1.05,
+    "max_new_tokens": 3072,
+    "top_k": null,
+    "top_p": null,
+    "smoothing_factor": 0.2,
+    "smoothing_curve": 1.0
+}
