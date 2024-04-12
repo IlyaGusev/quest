@@ -1,0 +1,10 @@
+{
+    "do_sample": true,
+    "repetition_penalty": 1.05,
+    "max_new_tokens": 3072,
+    "top_k": null,
+    "top_p": null,
+    "mirostat_mode": 2,
+    "mirostat_tau": 6.0,
+    "mirostat_eta": 0.1
+}

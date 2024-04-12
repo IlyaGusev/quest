@@ -5,6 +5,7 @@ import random
 import torch
 import numpy as np
 import transformers
+from jinja2 import Template
 
 
 def read_jsonl(file_name):
@@ -38,3 +39,9 @@ def gen_batch(records, batch_size):
         batch = records[batch_start: batch_end]
         batch_start = batch_end
         yield batch
+
+
+def encode_prompt(template_path, **kwargs):
+    with open(template_path) as f:
+        template = Template(f.read())
+    return template.render(**kwargs).strip() + "\n"

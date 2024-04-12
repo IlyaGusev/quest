@@ -2,6 +2,8 @@
     "do_sample": true,
     "repetition_penalty": 1.05,
     "max_new_tokens": 3072,
+    "top_p": null,
+    "top_k": null,
     "dynamic_temperature": true,
     "dynatemp_low": 0.5,
     "dynatemp_high": 1.5,

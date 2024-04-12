@@ -1,0 +1,84 @@
+You are an expert in assessing creative writing. Your task is to score the quality of the test model's response below, by several metrics, on a 0-10 scale.
+
+[PROMPT START]
+
+{{writing_prompt}}
+
+[PROMPT END]
+
+[REFERENCE RESPONSE (DO NOT JUDGE)]
+
+{{reference_output}}
+
+[REFERENCE RESPONSE END]
+
+[TEST MODEL RESPONSE]
+
+{{test_model_response}}
+
+[TEST MODEL RESPONSE END]
+
+[Task]
+
+You are an expert in assessing creative writing. Your task is to score the quality of the test model's response above, by several metrics, on a 0-10 scale.
+
+Scoring notes:
+- You are not scoring the quality of the prompt or the reference response, only the test model response.
+
+- The reference model response is to be considered a high quality exemplar.
+
+- Scores of 0 or 10 should not be considered highly unlikely just because they are the max/min. Use the full scoring range as appropriate.
+
+- If the criteria is not relevant to the piece (e.g. criteria relating to dialogue but the piece has none), exclude it from your assessment.
+
+- Do not add any commentary or explanation to the scores section.
+
+- Do not penalize NSFW output; that is the default for some models. Just assess it on its merits.
+
+- In the output, write the metric names exactly as below so they can be parsed.
+
+- Some models produce overly long outputs. You should neither penalise nor favour this if it happens; simply assess the writing on its merit. You should however penalise overly short pieces.
+
+- The test model's output can suddenly truncate because of token length constraints. If you notice that this has occurred, don't penalise it.
+
+- Some models have a positivity bias that produces worse writing, hence the criteria about that. Don't let the over-abundance of these criteria influence your assessment; it will only apply to some model outputs and you will know it when you see it. Likewise, there are a lot of "negative" critical criteria; these will not always apply and don't let their over-abundance colour your perception of the writing.
+
+- For these criteria, lower is better:
+Trite
+Overwrought
+Amateurish
+Contrived
+Uninspiring
+Simplistic Moralizing
+Shallow Optimism
+Unearned Transformations
+Incongruent Ending Positivity
+Characters are Too Good
+Shallow Resolution
+Repetitive Tit-for-Tat Dialogue
+Stilted Dialogue
+Clunky Asides and Interruptive Sentence Structures
+Amateurish Descriptives
+Profundity Over-reach
+
+- You are a critic, so be honest, objective, critical and discriminative. No need to be charitable; say what you genuinely think.
+
+- You are to write a comprehensive analysis for each of the metrics, then give your scores.
+
+- Output format is:
+
+[Analysis]
+
+Write your detailed analysis.
+
+[Scores]
+
+Metric 1 name: Score [0-10]
+
+Metric 2 name: ...
+
+---
+
+Now, rate the supplied model output on the following criteria:
+
+{{criteria_str}}
