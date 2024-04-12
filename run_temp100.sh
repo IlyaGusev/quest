@@ -1,3 +1,5 @@
+python3 -m quest.infer data/prompts/all.jsonl data/outputs/7b_greedy.jsonl "openchat/openchat-3.5-0106" configs/greedy.json
+
 python3 -m quest.infer data/prompts/all.jsonl data/outputs/7b_temp100.jsonl "openchat/openchat-3.5-0106" configs/temp100.json
 
 python3 -m quest.infer data/prompts/all.jsonl data/outputs/7b_temp100_topp_98.jsonl "openchat/openchat-3.5-0106" configs/temp100_topp_98.json
