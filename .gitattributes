@@ -1,4 +1,5 @@
 data/prompts/*.jsonl filter=lfs diff=lfs merge=lfs -text
 data/outputs/*.jsonl filter=lfs diff=lfs merge=lfs -text
 data/outputs/*.json filter=lfs diff=lfs merge=lfs -text
+data/outputs/v2/*.jsonl filter=lfs diff=lfs merge=lfs -text
 results/**/*.json filter=lfs diff=lfs merge=lfs -text
