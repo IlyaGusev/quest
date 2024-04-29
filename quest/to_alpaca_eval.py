@@ -19,7 +19,17 @@ def postprocess(record):
     return record
 
 
-def to_alpaca_eval(
+def to_alpaca_eval(records):
+    records = [postprocess(r) for r in records]
+    records = [{
+        "instruction": r["prompt"],
+        "output": r["output"],
+        "generator": r["config_name"].replace(".json", ""),
+    } for r in records]
+    return records
+
+
+def to_alpaca_eval_main(
     input_path: str,
     output_path: str,
     nrows: Optional[int] = None,
@@ -30,13 +40,9 @@ def to_alpaca_eval(
         records = [r for r in records if r["source"] == source]
     if nrows:
         records = records[:nrows]
-    records = [postprocess(r) for r in records]
+    records = to_alpaca_eval(records)
     with open(output_path, "w") as w:
-        json.dump([{
-            "instruction": r["prompt"],
-            "output": r["output"],
-            "generator": r["config_name"].replace(".json", ""),
-        } for r in records], w, indent=4)
+        json.dump(records, w, indent=4)
 
 
 if __name__ == "__main__":

@@ -5,7 +5,7 @@ import torch
 import fire
 
 
-def process_scores(input_dir, pad_token_id: int = 0, k: int = 30):
+def process_scores(input_dir, pad_token_id: int = 0, k: int = 30, debug: bool = False):
     possible_cnt = Counter()
     real_cnt = Counter()
     all_tokens_count = 0
@@ -13,7 +13,7 @@ def process_scores(input_dir, pad_token_id: int = 0, k: int = 30):
         file_path = os.path.join(input_dir, file_name)
         if not file_path.endswith(".pt"):
             continue
-        meta = torch.load(file_path)
+        meta = torch.load(file_path, map_location=torch.device("cpu"))
         tokens_count = (meta["output_ids"] != 0).sum().item()
         all_tokens_count += tokens_count
         values = meta["scores_values"][:tokens_count]
@@ -30,14 +30,16 @@ def process_scores(input_dir, pad_token_id: int = 0, k: int = 30):
     for idx in range(k, 0, -1):
         possible_cnt[idx] += possible_cnt[idx+1]
 
-    print("Tokens count:", all_tokens_count)
-    print("Possible positions:")
+    if debug:
+        print("Tokens count:", all_tokens_count)
+        print("Possible positions:")
     possible_positions = [possible_cnt[idx]/all_tokens_count for idx in range(1, k+1)]
-    print(possible_positions)
-
-    print("Real positions:")
+    if debug:
+        print(possible_positions)
+        print("Real positions:")
     real_positions = [real_cnt[idx]/all_tokens_count for idx in range(1, k+1)]
-    print(real_positions)
+    if debug:
+        print(real_positions)
 
     return possible_positions, real_positions
 

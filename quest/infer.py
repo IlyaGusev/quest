@@ -133,7 +133,7 @@ def infer(
     records = list(read_jsonl(input_path))
     meta_dir = ".".join(output_path.split(".")[:-1])
     Path(meta_dir).mkdir(parents=True, exist_ok=True)
-    with open(output_path, "w") as w:
+    with open(output_path, "w", encoding="utf-8") as w:
         num = 0
         for batch in gen_batch(records, batch_size):
             prompts = [r["prompt"] for r in batch]
@@ -156,7 +156,11 @@ def infer(
                 record["output"] = output
                 record["model_name"] = model_name
                 record["config_name"] = generation_config_to_name(generation_config)
-                w.write(json.dumps(record, ensure_ascii=False) + "\n")
+                try:
+                    w.write(json.dumps(record, ensure_ascii=False) + "\n")
+                except Exception as e:
+                    print(record)
+                    raise e
                 torch.save(meta, os.path.join(meta_dir, f"{num}.pt"))
                 num += 1
 
