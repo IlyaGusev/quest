@@ -5,21 +5,66 @@ import torch
 
 from quest.infer import infer
 
-temperatures = [1.0, 0.2, 0.6, 1.4, 1.8, 2.2]
+temperatures = [1.4, 1.0, 1.8, 2.2, 0.6]
 top_p = [0.6, 0.7, 0.8, 0.9, 0.95, 0.98]
 min_p = [0.02, 0.05, 0.1, 0.2, 0.3, 0.4]
 
 
-def get_output_path(model_slug, temperature, top_p, min_p):
+BORING_OUTPUTS = [
+    "openchat_temp_20",
+    "openchat_temp_20_top_p_98",
+    "openchat_temp_20_top_p_95",
+    "openchat_temp_20_top_p_90",
+    "openchat_temp_20_top_p_80",
+    "openchat_temp_20_top_p_70",
+    "openchat_temp_20_min_p_02",
+    "openchat_temp_20_min_p_05",
+    "openchat_temp_20_min_p_10",
+    "openchat_temp_20_min_p_20",
+    "openchat_temp_20_min_p_30",
+    "openchat_temp_20_min_p_40",
+    "openchat_temp_60_min_p_20",
+    "openchat_temp_60_min_p_30",
+    "openchat_temp_60_min_p_40",
+    "openchat_temp_60_top_p_60",
+    "openchat_temp_60_top_p_70"
+]
+CRAZY_OUTPUTS = [
+    "openchat_temp_140",
+    "openchat_temp_180",
+    "openchat_temp_220",
+    "openchat_temp_140_top_p_70",
+    "openchat_temp_140_top_p_80",
+    "openchat_temp_140_top_p_90",
+    "openchat_temp_140_top_p_95",
+    "openchat_temp_140_top_p_98",
+    "openchat_temp_180_top_p_60",
+    "openchat_temp_180_top_p_70",
+    "openchat_temp_180_top_p_80",
+    "openchat_temp_180_top_p_90",
+    "openchat_temp_180_top_p_95",
+    "openchat_temp_180_top_p_98",
+    "openchat_temp_180_min_p_02",
+    "openchat_temp_180_min_p_05",
+    "openchat_temp_220_top_p_60",
+    "openchat_temp_220_top_p_70",
+    "openchat_temp_220_top_p_80",
+    "openchat_temp_220_top_p_90",
+    "openchat_temp_220_top_p_95",
+    "openchat_temp_220_top_p_98",
+    "openchat_temp_220_min_p_02",
+    "openchat_temp_220_min_p_05",
+    "openchat_temp_220_min_p_10"
+]
+
+def get_output_name(model_slug, temperature, top_p, min_p):
     name = [model_slug]
     name.append("temp_{}".format(int(temperature * 100)))
     if top_p is not None:
         name.append("top_p_{:02d}".format(int(top_p * 100)))
     if min_p is not None:
         name.append("min_p_{:02d}".format(int(min_p * 100)))
-    output_name = "_".join(name)
-    output_path = f"data/outputs/v2/{output_name}.jsonl"
-    return output_path
+    return = "_".join(name)
 
 
 def run_exp(
@@ -30,12 +75,17 @@ def run_exp(
     min_p: float = None,
     model: AutoModelForCausalLM = None
 ):
-    output_path = get_output_path(
+    output_name = get_output_name(
         model_slug=model_slug,
         temperature=temperature,
         top_p=top_p,
         min_p=min_p
     )
+    if output_name in BORING_OUTPUTS or output_name in CRAZY_OUTPUTS:
+        print(f"skipping {output_name}")
+        return
+
+    output_path = f"data/outputs/v2/{output_name}.jsonl"
     if os.path.exists(output_path):
         print(f"{output_path} exists, skipping!")
         return
